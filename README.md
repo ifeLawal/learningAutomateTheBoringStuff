@@ -1,4 +1,4 @@
-# Learning to Automate The Boring Stuff using Python. 
+# Using Python to Automate The Boring Stuff (web scraping, excel manipulation, screen tasks, etc.). 
 # This is a repo of exercises from the book Automating the Boring Stuff by Al Sweigart done by Ife Lawal
 
 A repo for all the exercises from the Automate the Boring Stuff book by Al Sweigart
