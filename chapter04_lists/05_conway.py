@@ -1,13 +1,16 @@
 # 4 parts to the conway code
-# part 1: checking/storing what is next to the position you are checking
-# part 2: evaluating what is next to the position in regards to conway
-# part 3: updating the duplicate list
-# part 4: printing what the 2 dimensional field looks like
+# part 1: checking/storing how many alive and dead cells are next to the x and y position you are checking
+# part 2: evaluating the amount of alive and dead cells next to the position in regards to conway rules
+# part 3: updating a duplicate list
+# part 4: once you go through all the x and y positions, copy the duplicate into the current field
+# part 5: print what the 2 dimensional field looks like
 
 import copy, random, time
 
 field = [[]]
-aliveOrNot = ['#', '']
+alive = '#'
+dead = ' '
+aliveOrNot = ['#', ' ']
 
 # part 0 create a field list with alive and dead cells
 def createField(list, xLength, yLength):
@@ -22,51 +25,87 @@ def createField(list, xLength, yLength):
             cellState = random.choice(aliveOrNot) # choose state of cell
             list[i].append(cellState) # append to the row
         
+# part 1
 # check the viable neighbor spots if wrap around is not allowed
-# return true if the spot exists, false if it does not
-# return this in list form
-def findViableNeighbors(list,x,y):
-    viableNeighbors = []
+# check if the neighbor spot exists, if it does store the state of the cell in the list
+# if the neighbor spot does not exist, treat it like a dead cell
+# return the list of neighbor cell states
+def findNeighborStatesNoWrap(list,x,y):
+    neighborStates = []
     for i in range(-1,2):
         for j in range(-1,2):
-            if(x+i < 0 or y+j < 0 or x+i > len(list) or y+j > len(list[0])):
-                viableNeighbors.append(False)
+            # check if x and  y field positions are between 0 and less than list length
+            if(x+i >= 0 and y+j >= 0 and x+i < len(list) and y+j < len(list[0])):
+                # if the position is not itself i and j = 0, append what the state of the cell is
+                if(not(i == 0 and j == 0)):
+                    neighborStates.append(list[x+i][y+j])
             else:
-                viableNeighbors.append(True)
-    return viableNeighbors
+                neighborStates.append(' ')
+    return neighborStates
 
-# check for index out of bounds for a wrap around conway
-def findOutOfBoundsNeighbors(list, x, y):
+# part 1
+# check for index out of bounds at the far right edge and below edge
+# for a wrap around conway field. If the neighbor is not out of bounds
+# store the state of the neighbor cell
+# return what the neighbor states as a list
+def findNeighborStatesWrap(list, x, y):
     viableNeighbors = []
     for i in range(-1,2):
         for j in range(-1,2):
             try:
-                list[x+i][y+j]
-                viableNeighbors.append(True)
+                # if the position is not itself i and j are zero, append what the state of the cell is
+                if(not(i == 0 and j == 0)):
+                    viableNeighbors.append(list[x+i][y+j])
             except IndexError:
-                viableNeighbors.append(False)
+                viableNeighbors.append(' ')
     return viableNeighbors
 
-createField(field,4,5)
-print(field)
-viableNeighbors = findOutOfBoundsNeighbors(field,4,5)
-print(viableNeighbors)
+# part 4 print field on a 1 by 1 line so it looks good
+def printField(field):
+    for i in range(len(field)):
+        print(field[i])
+
+# part 2 check the conway rules using the neighbor states and current cell state
+# return what the state of the cell should be based on the rules
+def conwayRules(neighbors, stateOfCell):
+    if(stateOfCell == alive):
+        if(neighbors.count(alive) == 2 or neighbors.count(alive) == 3):
+            return alive
+    elif(stateOfCell == dead):
+        if(neighbors.count(alive) == 3):
+            return alive
+    return dead
+
+def playConwaysGame(field):
+    fieldNextStep = copy.deepcopy(field)
+    for i in range(len(field)):
+        for j in range(len(field[0])):
+            currentCellState = field[i][j]
+            neighbors = findNeighborStatesNoWrap(field, i, j)
+            fieldNextStep[i][j] = conwayRules(neighbors, currentCellState)
+    # field = fieldNextStep
+    printField(fieldNextStep)
+    time.sleep(0.5)
+
+createField(field,5,5)
+printField(field)
+print()
+playConwaysGame(field)
 
 # part 1
+# given the field and position, check the viable neighbors
+# return a list of alive and dead cells
 def checkPosition(list, position):
-    while True:
-        for x in range(len(field)):
-        # loop through the field from top to down
-            for y in range(len(field[0])):
-            # loop through the field from left to right
-                viableNeighbors = [
-                    checktopLeft(field,x,y),
-                    checktop(field,x,y),
-                    checktopRight(field,x,y)
-                ]
+    for x in range(len(field)):
+    # loop through the field from top to down
+        for y in range(len(field[0])):
+        # loop through the field from left to right
+            viableNeighbors = [
+                checktopLeft(field,x,y),
+                checktop(field,x,y),
+                checktopRight(field,x,y)
+            ]
         break
-
-
 
 
 # check the viable neighbor spots using a try except function seeing if the index exists
