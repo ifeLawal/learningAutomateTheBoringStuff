@@ -5,7 +5,7 @@
 # part 4: once you go through all the x and y positions, copy the duplicate into the current field
 # part 5: print what the 2 dimensional field looks like
 
-import copy, random, time
+import copy, random, time, sys
 
 field = [[]]
 alive = '#'
@@ -62,6 +62,7 @@ def findNeighborStatesWrap(list, x, y):
 
 # part 4 print field on a 1 by 1 line so it looks good
 def printField(field):
+    print('\n\n')
     for i in range(len(field)):
         print(field[i])
 
@@ -77,15 +78,18 @@ def conwayRules(neighbors, stateOfCell):
     return dead
 
 def playConwaysGame(field):
-    fieldNextStep = copy.deepcopy(field)
-    for i in range(len(field)):
-        for j in range(len(field[0])):
-            currentCellState = field[i][j]
-            neighbors = findNeighborStatesNoWrap(field, i, j)
-            fieldNextStep[i][j] = conwayRules(neighbors, currentCellState)
-    # field = fieldNextStep
-    printField(fieldNextStep)
-    time.sleep(0.5)
+    while True:
+        try:
+            fieldTemp = copy.deepcopy(field)
+            for i in range(len(field)):
+                for j in range(len(field[0])):
+                    currentCellState = fieldTemp[i][j]
+                    neighbors = findNeighborStatesWrap(fieldTemp, i, j)
+                    field[i][j] = conwayRules(neighbors, currentCellState)
+            printField(field)
+            time.sleep(0.5)
+        except KeyboardInterrupt:
+            sys.exit()
 
 createField(field,5,5)
 printField(field)
